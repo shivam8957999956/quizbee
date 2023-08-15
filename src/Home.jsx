@@ -4,11 +4,16 @@ import RegisterComponent from "./RegisterComponent";
 import TopicInput from "./TopicInput";
 function Home() {
   const [jsonData, setJsonData] = useState({});
+  const [value, setvalue] = useState(1);
   const [auth, setAuth] = useState("false");
   const handleLogout = () => {
     localStorage.removeItem("authenticatedUser");
     localStorage.setItem("authenticated", "false");
     window.location.reload(false);
+  };
+  const handleValue = () => {
+    if (value) setvalue(0);
+    else setvalue(1);
   };
 
   useEffect(() => {
@@ -23,17 +28,31 @@ function Home() {
   return (
     <div>
       {auth === "true" ? (
-        <>
-          <h2>Welcome, {jsonData.username}!</h2>
-          <p>Email: {jsonData.email}</p>
-          <button onClick={handleLogout}>Logout</button>
+        <div className="header-text">
+          <div className="header">
+            <h2>Welcome, {jsonData.username}!</h2>
+            <p>Email: {jsonData.email}</p>
+            <button className="btn1" onClick={handleLogout}>
+              Logout
+            </button>
+          </div>
           <TopicInput />
-        </>
+        </div>
       ) : (
         <>
-          <p>Please log in to view this content.</p>
-          <LoginComponent />
-          <RegisterComponent />
+          <div className="header">
+            <p>Please log in to view this content or Register if you are New</p>
+            {value ? (
+              <button className="btn1" onClick={handleValue}>
+                Register
+              </button>
+            ) : (
+              <button className="btn1" onClick={handleValue}>
+                Login
+              </button>
+            )}
+          </div>
+          {value ? <LoginComponent /> : <RegisterComponent />}
         </>
       )}
     </div>

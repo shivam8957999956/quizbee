@@ -34,6 +34,7 @@ const TopicInput = () => {
     { id: "32", name: "Entertainment: Cartoon & Animations" },
   ]);
   const [questions, setQuestions] = useState([]);
+  const [acc, setAcc] = useState(0);
   const [userAnswers, setUserAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
 
@@ -44,6 +45,7 @@ const TopicInput = () => {
           amount: 5, // Number of questions
           category: selectedCategory,
           type: "multiple",
+          difficulty: calculateDifficulty(acc),
         },
       });
 
@@ -77,7 +79,7 @@ const TopicInput = () => {
 
     const accuracy = (correctAnswers.length / questions.length) * 100;
     const score = correctAnswers.length;
-
+    setAcc(correctAnswers.length / questions.length);
     console.log(`Accuracy: ${accuracy.toFixed(2)}%`);
     console.log(`Correct Answers: ${score} / ${questions.length}`);
   };
@@ -96,9 +98,17 @@ const TopicInput = () => {
 
     return correctAnswers.length;
   };
-
+  const calculateDifficulty = (accuracy) => {
+    if (accuracy >= 0.8) {
+      return "hard";
+    } else if (accuracy >= 0.6) {
+      return "medium";
+    } else {
+      return "easy";
+    }
+  };
   return (
-    <div>
+    <div className="login-box  extra">
       <h2>Choose a Category</h2>
       <select
         value={selectedCategory}
@@ -109,34 +119,40 @@ const TopicInput = () => {
           </option>
         ))}
       </select>
-      <button onClick={fetchQuestions}>Get Questions</button>
-
-      {questions.map((question, index) => (
-        <div key={index}>
-          <h3>Question {index + 1}</h3>
-          <div dangerouslySetInnerHTML={{ __html: question.question }} />
-          <ul>
-            {[...question.incorrect_answers, question.correct_answer].map(
-              (option, optionIndex) => (
-                <li key={optionIndex}>
-                  <label>
-                    <input
-                      type="radio"
-                      name={`question-${index}`}
-                      value={option}
-                      checked={userAnswers[index] === option}
-                      onChange={() => handleOptionSelect(index, option)}
-                    />
-                    <span dangerouslySetInnerHTML={{ __html: option }} />
-                  </label>
-                </li>
-              ),
-            )}
-          </ul>
-        </div>
-      ))}
-
-      <button onClick={handleSubmit}>Submit Answers</button>
+      <button className="btn" onClick={fetchQuestions}>
+        {showResults == false ? "Get Questions" : "Go to next Level"}
+      </button>
+      {showResults === false && (
+        <>
+          {questions.map((question, index) => (
+            <div className="question" key={index}>
+              <h3>Question {index + 1}</h3>
+              <div dangerouslySetInnerHTML={{ __html: question.question }} />
+              <ul>
+                {[...question.incorrect_answers, question.correct_answer].map(
+                  (option, optionIndex) => (
+                    <li className="List" key={optionIndex}>
+                      <label>
+                        <input
+                          type="radio"
+                          name={`question-${index}`}
+                          value={option}
+                          checked={userAnswers[index] === option}
+                          onChange={() => handleOptionSelect(index, option)}
+                        />
+                        <span dangerouslySetInnerHTML={{ __html: option }} />
+                      </label>
+                    </li>
+                  ),
+                )}
+              </ul>
+            </div>
+          ))}
+          <button className="btn" onClick={handleSubmit}>
+            Submit Answers
+          </button>
+        </>
+      )}
       {showResults && (
         <div>
           <h2>Quiz Results</h2>
